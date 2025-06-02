@@ -2,5 +2,25 @@
   <app-header-page title="Publi-Reportages" subtitle="Découvrez les initiatives agroécologiques innovantes à travers l'Afrique de l'Ouest" />
 </section>
 <div class="mainContainer">
-  <app-reportage-card />
+  <!-- Gestion du chargement -->
+  <div *ngIf="isLoading" class="loading-indicator">
+    <p>Chargement des reportages...</p>
+    <!-- Vous pouvez ajouter un spinner ou une animation ici -->
+  </div>
+
+  <!-- Gestion des erreurs -->
+  <div *ngIf="!isLoading && errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+    <button (click)="loadReportages()">Réessayer</button>
+  </div>
+
+  <!-- Affichage des reportages -->
+  <div *ngIf="!isLoading && !errorMessage && reportages.length > 0" class="reportages-list">
+    <app-reportage-card *ngFor="let reportage of reportages" [reportageData]="reportage"></app-reportage-card>
+  </div>
+
+  <!-- Cas où il n'y a pas de reportages -->
+  <div *ngIf="!isLoading && !errorMessage && reportages.length === 0" class="no-reportages">
+    <p>Aucun reportage disponible pour le moment.</p>
+  </div>
 </div>

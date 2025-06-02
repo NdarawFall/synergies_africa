@@ -1,19 +1,27 @@
-<section class="reportages-list">
-  <div class="container">
-    <div class="reportage-card animate-on-scroll" data-category="success-stories">
-      <div class="reportage-image">
-        <img src="images/IMG-20250508-WA0015.jpg" alt="Technique de compostage" width="400" height="250">
-      </div>
-      <div class="reportage-content">
-        <h2>Révolution verte à Korhogo</h2>
-        <p class="reportage-meta"><i class="far fa-calendar-alt"></i> 15 juin 2023 | <i
-            class="fas fa-map-marker-alt"></i> Côte d'Ivoire</p>
-        <p>Comment une coopérative de femmes a transformé l'agriculture locale grâce au compostage et aux techniques
-          agroécologiques innovantes.</p>
-        <div class="reportage-actions">
-          <a href="reportages/revolution-verte-korhogo.html" class="btn btn-primary">Lire le reportage</a>
-        </div>
-      </div>
+<!-- La structure externe <section> et <div class="container"> est probablement gérée par le composant parent (ReportagePageComponent) lors de la boucle *ngFor -->
+<!-- Donc, cette carte ne devrait contenir que la structure d'UNE SEULE carte. -->
+<div class="reportage-card animate-on-scroll" [attr.data-category]="reportageData.type" *ngIf="reportageData">
+  <div class="reportage-image" *ngIf="firstImageUrl">
+    <!-- Utilisation de la balise <img> standard car firstImageUrl est une URL complète -->
+    <img [src]="firstImageUrl" [alt]="reportageData.title || 'Image du reportage'" width="400" height="250" style="object-fit: cover;">
+  </div>
+  <div class="reportage-image" *ngIf="!firstImageUrl">
+    <!-- Placeholder si aucune image n'est disponible -->
+    <img src="assets/images/placeholder.png" alt="Image non disponible" width="400" height="250">
+  </div>
+  <div class="reportage-content">
+    <h2>{{ reportageData.title }}</h2>
+    <p class="reportage-meta">
+      <i class="far fa-calendar-alt"></i> {{ reportageData.eventDate | date:'dd MMMM yyyy':'':'fr-FR' }}
+      <span *ngIf="reportageData.location"> | <i class="fas fa-map-marker-alt"></i> {{ reportageData.location }}</span>
+    </p>
+    <p>{{ reportageData.description }}</p>
+    <div class="reportage-actions">
+      <!-- Le lien devra être dynamique, par exemple basé sur l'ID du reportage -->
+      <!-- Pour l'instant, un lien générique ou pas de lien si c'est juste une carte d'aperçu -->
+      <a [routerLink]="['/reportages', reportageData.id]" class="btn btn-primary" *ngIf="reportageData.id">Lire le reportage</a>
+      <!-- Ou si vous n'avez pas de page de détail : -->
+      <!-- <button class="btn btn-primary">Plus d'infos</button> -->
     </div>
   </div>
-</section>
+</div>
