@@ -80,24 +80,20 @@ export class CreatePublicationPagesComponent implements OnInit {
 
         try {
             const formValue = this.publicationForm.value;
-            const publicationData = {
-                title: formValue.title,
-                type: formValue.type,
-                description: formValue.description,
-                content: formValue.content,
-                location: formValue.location,
-                eventDate: new Date(formValue.date), // Convertir la chaîne de date en objet Date
-            };
-
             await this.publicationService.addPublication(
-                publicationData,
+                {
+                    title: formValue.title,
+                    type: formValue.type,
+                    description: formValue.description,
+                    content: formValue.content,
+                    location: formValue.location,
+                    eventDate: new Date(formValue.date)
+                },
                 this.selectedFiles
             );
             this.successMessage = "Publication ajoutée avec succès !";
             this.publicationForm.reset();
             this.selectedFiles = null;
-            // Optionnel: rediriger l'utilisateur
-            // this.router.navigate(['/']);
         } catch (error: any) {
             console.error("Erreur lors de la publication:", error);
             this.errorMessage = `Erreur lors de la publication: ${

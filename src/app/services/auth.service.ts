@@ -1,58 +1,42 @@
-import { Injectable, Inject, inject } from "@angular/core";
-import {
-    Auth,
-    signInWithPopup,
-    GoogleAuthProvider,
-    signOut,
-    User,
-    authState,
-} from "@angular/fire/auth";
-import { Observable, from, BehaviorSubject, map, tap } from "rxjs";
+import { Injectable, inject } from "@angular/core";
+import { Observable, BehaviorSubject, from } from "rxjs";
+import { map } from 'rxjs/operators';
+import { SupabaseService } from "./supabase.service";
+import { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 
 @Injectable({
     providedIn: "root",
 })
 export class AuthService {
-    private auth: Auth = inject(Auth); // Injection moderne avec inject()
-
-    // Observable pour suivre l'état de l'authentification
-    // authState() renvoie User | null
-    public readonly user$: Observable<User | null> = authState(this.auth);
-
-    // Un BehaviorSubject pour stocker l'utilisateur actuel de manière synchrone si besoin
-    // Mais user$ est généralement suffisant et plus réactif
-    private currentUserSubject = new BehaviorSubject<User | null>(null);
+    private currentUserSubject = new BehaviorSubject<any>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
 
-    constructor() {
-        // Mettre à jour currentUserSubject quand user$ change
-        this.user$.subscribe((user) => this.currentUserSubject.next(user));
+    constructor(private supabaseService: SupabaseService) {
+        this.supabaseService.supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
+            if (event === 'SIGNED_IN' && session) {
+                this.currentUserSubject.next(session.user);
+            } else if (event === 'SIGNED_OUT') {
+                this.currentUserSubject.next(null);
+            }
+        });
     }
 
-    // Connexion avec Google
-    googleSignIn(): Observable<User | null> {
-        const provider = new GoogleAuthProvider();
-        return from(signInWithPopup(this.auth, provider)).pipe(
-            map((result) => result.user), // Extrait l'objet User de UserCredential
-            tap((user) => console.log("Utilisateur connecté via Google:", user))
-        );
+    googleSignIn(): Observable<any> {
+        return from(this.supabaseService.supabase.auth.signInWithOAuth({
+            provider: 'google'
+        }));
     }
 
-    // Déconnexion
-    signOut(): Observable<void> {
-        return from(signOut(this.auth)).pipe(
-            tap(() => console.log("Utilisateur déconnecté"))
-        );
+    signOut(): Observable<any> {
+        return from(this.supabaseService.supabase.auth.signOut());
     }
 
-    // Pour obtenir l'utilisateur actuel de manière synchrone (si déjà chargé)
-    // Attention : peut être null au chargement initial. Préférez user$ pour la réactivité.
-    public get currentUserValue(): User | null {
+    public get currentUserValue(): any {
         return this.currentUserSubject.value;
     }
 
-    // Utile pour vérifier si l'utilisateur est connecté dans les gardes ou composants
     isLoggedIn(): Observable<boolean> {
-        return this.user$.pipe(map((user) => !!user));
+        return this.currentUser$.pipe(map(user => !!user));
     }
+
 }

@@ -3,6 +3,9 @@ import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
 import { registerLocaleData } from '@angular/common';
 import * as fr from '@angular/common/locales/fr';
+//import { initializeApp } from "firebase/app";
+//import { getAnalytics } from "firebase/analytics";
+
 
 registerLocaleData(fr.default);
 bootstrapApplication(AppComponent, appConfig)

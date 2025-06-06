@@ -10,8 +10,9 @@ import { Cloudinary } from '@cloudinary/url-gen'; // Ajout pour Cloudinary confi
 import { routes } from "./app.routes";
 
 // Imports pour Firebase (provider functions)
-import { initializeApp, provideFirebaseApp } from "@angular/fire/app";
-import { getAuth, provideAuth } from "@angular/fire/auth";
+// Supprimez ces lignes :
+// import { initializeApp, provideFirebaseApp } from "@angular/fire/app";
+// import { getAuth, provideAuth } from "@angular/fire/auth";
 
 import { environment } from "../environments/environment";
 
@@ -47,8 +48,9 @@ export const appConfig: ApplicationConfig = {
         { provide: LOCALE_ID, useValue: "fr-FR" },
 
         // Intégration directe des providers Firebase (Auth uniquement)
-        provideFirebaseApp(() => initializeApp(environment.firebase)),
-        provideAuth(() => getAuth()),
+        // Dans providers, supprimez :
+        // provideFirebaseApp(() => initializeApp(environment.firebase)),
+        // provideAuth(() => getAuth()),
 
         // Provider pour le client Supabase
         { provide: SupabaseClient, useValue: supabaseInstance },

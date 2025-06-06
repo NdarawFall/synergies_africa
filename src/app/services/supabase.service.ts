@@ -2,20 +2,19 @@ import { Injectable } from '@angular/core';
 import { SupabaseClient, PostgrestSingleResponse } from '@supabase/supabase-js';
 import { Publication } from '../models/publication.model'; // Importer le modèle
 
-// Interface pour les données envoyées à la méthode d'insertion de Supabase
-// Doit correspondre aux noms de colonnes de la table Supabase
+// Interface pour les données ENVOYÉES à la méthode d'insertion de Supabase
+// Doit correspondre aux NOMS DE COLONNES de la table Supabase
 export interface PublicationInsertData {
   title: string;
   type: "publi" | "agro" | "";
-  description?: string; // Ou descrption si c'est le nom de la colonne
+  description?: string;
   content: string;
   location: string;
   event_date: string | null;
   photo_urls: string[];
   user_id: string;
   user_display_name: string;
-  createdAt: string; // Correspond à votre colonne Supabase 'createdAt'
-  // Ajoutez d'autres champs si nécessaire, en respectant la casse de vos colonnes DB
+  created_at: string; // Correction: utiliser snake_case pour la cohérence
 }
 
 
@@ -24,64 +23,82 @@ export interface PublicationInsertData {
 })
 export class SupabaseService {
 
-  constructor(private supabase: SupabaseClient) { }
+  constructor(public supabase: SupabaseClient) { }
 
   async createPublication(publicationData: PublicationInsertData): Promise<Publication | null> {
-    // publicationData est maintenant l'objet avec les clés mappées (snake_case et createdAt)
-    // Assurez-vous que le nom de la table 'publications' correspond à votre table dans Supabase
+    // publicationData a maintenant les clés qui correspondent aux noms de colonnes DB
     const { data, error } = await this.supabase
-      .from('publications')
-      .insert([publicationData]) // publicationData a maintenant les clés attendues par la DB
+      .from('publications') // Assurez-vous que le nom de la table est correct
+      .insert([publicationData])
       .select() // Pour retourner l'enregistrement inséré
       .single(); // Si vous vous attendez à un seul enregistrement retourné
 
     if (error) {
-      console.error('Erreur lors de la création de la publication dans Supabase:', error);
-      throw error; // Ou retournez null ou un objet d'erreur spécifique
+      console.error('Erreur Supabase lors de la création:', error);
+      // Lancer une erreur plus spécifique
+      throw new Error(`Échec de la création de la publication dans Supabase: ${error.message}`);
     }
-    // IMPORTANT: Si Supabase retourne les clés en snake_case (ex: created_at, user_id)
-    // et que votre modèle Publication est en camelCase (createdAt, userId),
-    // vous devrez mapper les clés de 'data' ici avant de le retourner comme 'Publication'.
-    // Par exemple:
-    // if (data) {
-    //   return {
-    //     id: data.id,
-    //     title: data.title,
-    //     type: data.type,
-    //     description: data.description, // ou data.descrption si c'est le nom de la colonne
-    //     content: data.content,
-    //     location: data.location,
-    //     eventDate: data.event_date ? new Date(data.event_date) : null,
-    //     photoUrls: data.photo_urls || [],
-    //     createdAt: data.createdAt ? new Date(data.createdAt) : undefined, // ou data.created_at
-    //     userId: data.user_id,
-    //     userDisplayName: data.user_display_name
-    //   } as Publication;
-    // }
-    return data as Publication | null; // Ce casting peut être incorrect si les casses ne correspondent pas.
+
+    // Mapper les données retournées par Supabase (noms de colonnes DB)
+    // vers le modèle Angular (camelCase)
+    // Dans la méthode createPublication, modifier le mapping :
+    if (data) {
+      return {
+        id: data.id,
+        title: data.title,
+        type: data.type,
+        description: data.description,
+        content: data.content,
+        location: data.location,
+        eventDate: data.event_date ? new Date(data.event_date) : null,
+        photoUrls: data.photo_urls || [],
+        createdAt: data.created_at ? new Date(data.created_at) : undefined, // Correction: utiliser created_at
+        userId: data.user_id,
+        userDisplayName: data.user_display_name
+      } as Publication;
+    }
+
+    return null;
   }
 
   async getPublications(typeFilter?: 'publi' | 'agro' | ''): Promise<Publication[] | null> {
-    let query = this.supabase.from('publications').select('*');
+    let query = this.supabase.from('publications').select('*'); // Sélectionne toutes les colonnes
 
     if (typeFilter) {
       query = query.eq('type', typeFilter);
     }
 
     // Vous pouvez ajouter d'autres filtres ou tris ici, par exemple :
-    // query = query.order('created_at', { ascending: false });
+    // Dans la méthode getPublications, modifier le tri :
+    query = query.order('created_at', { ascending: false }); // Correction: utiliser created_at
 
     const { data, error } = await query;
 
     if (error) {
-      console.error('Erreur lors de la récupération des publications depuis Supabase:', error);
-      throw error; // Ou retournez null ou un objet d'erreur spécifique
+      console.error('Erreur Supabase lors de la récupération:', error);
+      // Lancer une erreur plus spécifique
+      throw new Error(`Échec de la récupération des publications depuis Supabase: ${error.message}`);
     }
-    return data as Publication[] | null; // Assurez-vous que le casting est sûr ou validez les données
+
+    // Mapper les données retournées par Supabase (noms de colonnes DB)
+    // vers le modèle Angular (camelCase)
+    return data?.map(item => ({
+      id: item.id,
+      title: item.title,
+      type: item.type,
+      description: item.description,
+      content: item.content,
+      location: item.location,
+      eventDate: item.event_date ? new Date(item.event_date) : null,
+      photoUrls: item.photo_urls || [],
+      createdAt: item.created_at ? new Date(item.created_at) : undefined, // Correction: utiliser created_at au lieu de createdAt
+      userId: item.user_id,
+      userDisplayName: item.user_display_name
+    })) || null;
+
   }
 
-  // Vous ajouterez ici d'autres méthodes pour :
-  // - Lire des enregistrements (read) - comme l'exemple ci-dessus
-  // - Mettre à jour des enregistrements (update)
-  // - Supprimer des enregistrements (delete)
+  // Vous ajouterez ici d'autres méthodes (update, delete)
+
+  // Add method to insert Firebase user
 }
