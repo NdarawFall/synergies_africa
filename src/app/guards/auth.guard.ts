@@ -7,7 +7,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     const authService = inject(AuthService);
     const router = inject(Router);
 
-    return authService.user$.pipe(
+    return authService.currentUser$.pipe(
         take(1), // Prend la première valeur émise (l'état actuel) et se désinscrit
         map((user) => !!user), // Convertit l'objet utilisateur en booléen (true si connecté, false sinon)
         tap((isLoggedIn) => {

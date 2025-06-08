@@ -1,7 +1,8 @@
 import { Component, HostListener, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink, RouterModule } from "@angular/router";
-import { User } from "firebase/auth";
+//import { User } from "firebase/auth";
+import { User } from '@supabase/supabase-js';
 import { Observable } from "rxjs";
 import { AuthService } from "../../services/auth.service";
 
@@ -16,7 +17,8 @@ export class NavbarComponent {
     isMenuOpen = false;
     activeLink = "Accueil";
     authService: AuthService = inject(AuthService);
-    user$: Observable<User | null> = this.authService.user$;
+    //user$: Observable<User | null> = this.authService.user$;
+    user$: Observable<User | null> = this.authService.currentUser$;
     router: Router = inject(Router);
 
     toggleMenu(): void {

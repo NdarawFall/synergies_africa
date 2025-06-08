@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from "@angular/core";
 import { HeaderPageComponent } from "../../components/header-page/header-page.component";
 import { AsyncPipe, JsonPipe, NgIf } from "@angular/common";
 import { AuthService } from "../../services/auth.service";
-import { User } from "@angular/fire/auth"; // Importer User de @angular/fire/auth
+import { User } from '@supabase/supabase-js';
 import { Observable } from "rxjs";
 import { RouterLink } from "@angular/router";
 
@@ -14,7 +14,9 @@ import { RouterLink } from "@angular/router";
 })
 export class DashboardPagesComponent {
     authService: AuthService = inject(AuthService);
-    user$: Observable<User | null> = this.authService.user$; // Utiliser l'observable user$
+    
+    //user$: Observable<User | null> = this.authService.user$; // Utiliser l'observable user$
+    user$: Observable<User | null> = this.authService.currentUser$;
 
     constructor() {}
 
