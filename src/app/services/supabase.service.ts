@@ -110,7 +110,21 @@ export class SupabaseService {
   async getPublicationById(id: string): Promise<Publication | null> {
     const { data, error } = await this.supabase
       .from('publications') // Le nom de votre table
-      .select('*')
+      .select(
+        `
+        id,
+        title,
+        type,
+        description,
+        content,
+        location,
+        eventDate: event_date,
+        photoUrls: photo_urls,
+        createdAt: created_at,
+        userId: user_id,
+        userDisplayName: user_display_name
+      `
+      )
       .eq('id', id)
       .single(); // .single() est parfait : il retourne un objet ou une erreur s'il ne trouve pas exactement 1 résultat.
 

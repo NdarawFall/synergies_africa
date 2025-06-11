@@ -8,12 +8,13 @@
   <button (click)="goBack()" class="btn-primary">Retour</button>
 </div>
 
-<!-- Conteneur principal de la publication -->
+<!-- Le conteneur principal a déjà la garde !ngIf="publication", ce qui est parfait -->
 <div *ngIf="!isLoading && publication" class="publication-container">
 
   <header class="publication-header">
     <button (click)="goBack()" class="back-button">← Retour à la liste</button>
 
+    <!-- À l'intérieur du ngIf, "publication" n'est plus null. C'est sûr. -->
     <h1 class="publication-title">{{ publication.title }}</h1>
 
     <div class="publication-meta">
@@ -32,23 +33,26 @@
     </div>
   </header>
 
-  <!-- Galerie d'images (si des photos existent) -->
-  <div class="publication-gallery" *ngIf="publication.photoUrls && publication.photoUrls.length > 0">
+  <!-- Galerie d'images -->
+  <!-- LA CORRECTION EST ICI : on ajoute *ngIf="mainImageUrl" -->
+  <div *ngIf="mainImageUrl" class="publication-gallery">
+
     <div class="main-image">
-      <img [src]="mainImageUrl" [alt]="publication.title" *ngIf="mainImageUrl">
+      <!-- "publication.title" est sûr ici car on est dans le grand ngIf -->
+      <img [src]="mainImageUrl" [alt]="publication.title">
     </div>
-    <!-- Afficher les vignettes seulement s'il y a plus d'une photo -->
-    <div class="thumbnails" *ngIf="publication.photoUrls.length > 1">
-      <img *ngFor="let url of publication.photoUrls" [src]="url" [alt]="'Vignette de ' + publication.title"
-        class="thumbnail" [class.active]="url === mainImageUrl" (click)="changeMainImage(url)">
+
+    <div class="thumbnails-container" *ngIf="publication.photoUrls && publication.photoUrls.length > 1">
+      <h3>Autres images</h3>
+      <div class="thumbnails">
+        <img *ngFor="let url of publication.photoUrls" [src]="url" [alt]="'Vignette de ' + publication.title"
+          class="thumbnail" [class.active]="url === mainImageUrl" (click)="changeMainImage(url)">
+      </div>
     </div>
   </div>
 
   <!-- Contenu texte de l'article -->
   <main class="publication-content">
-    <!-- Utiliser [innerHTML] pour interpréter le contenu HTML venant de votre base de données.
-         ATTENTION : Assurez-vous que ce contenu est toujours sécurisé (sanitisé) avant de l'enregistrer
-         pour vous protéger contre les attaques XSS. -->
     <div [innerHTML]="publication.content"></div>
   </main>
 
