@@ -3,5 +3,25 @@
 </section>
 
 <div class="mainContainer">
-  <app-agro-echo-card />
+  <!-- Gestion du chargement -->
+  <div *ngIf="isLoading" class="loading-indicator">
+    <p>Chargement des actualités...</p>
+  </div>
+
+  <!-- Gestion des erreurs -->
+  <div *ngIf="!isLoading && errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+    <button (click)="loadAgroEchos()">Réessayer</button>
+  </div>
+
+  <!-- Affichage des actualités (boucle *ngFor) -->
+  <div *ngIf="!isLoading && !errorMessage && agroEchos.length > 0" class="agro-echos-list">
+    <!-- On boucle sur la liste agroEchos et on passe chaque élément à la carte -->
+    <app-agro-echo-card *ngFor="let echo of agroEchos" [agroEchoData]="echo"></app-agro-echo-card>
+  </div>
+
+  <!-- Cas où il n'y a pas d'actualités -->
+  <div *ngIf="!isLoading && !errorMessage && agroEchos.length === 0" class="no-reportages">
+    <p>Aucune actualité "Agro-Echos" disponible pour le moment.</p>
+  </div>
 </div>

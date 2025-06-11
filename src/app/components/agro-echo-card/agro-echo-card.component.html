@@ -1,17 +1,31 @@
-<section class="agro-echos-featured">
+<!-- On ajoute un *ngIf pour s'assurer que les données sont bien présentes avant d'essayer de les afficher -->
+<section class="agro-echos-featured" *ngIf="agroEchoData">
   <div class="container">
     <div class="featured-news">
-      <div class="featured-image">
-        <img src="images/IMG-20250508-WA0014.jpg" alt="Conférence sur l'agroécologie à Dakar" width="100%"
-          height="auto">
+      <!-- Image dynamique -->
+      <div class="featured-image" *ngIf="firstImageUrl">
+        <img [src]="firstImageUrl" [alt]="agroEchoData.title" width="100%" height="auto">
       </div>
+      <!-- Image par défaut si aucune n'est fournie -->
+      <div class="featured-image" *ngIf="!firstImageUrl">
+        <img src="assets/images/placeholder.png" alt="Image non disponible" width="100%" height="auto">
+      </div>
+
       <div class="featured-content">
-        <span class="news-date"><i class="far fa-calendar-alt"></i> 28 mai 2023</span>
-        <h2>Conférence internationale sur l'agroécologie à Dakar : vers une transformation des systèmes alimentaires
-          africains</h2>
-        <p>Plus de 300 experts, agriculteurs et décideurs politiques se sont réunis à Dakar pour discuter des moyens de
-          promouvoir l'agroécologie comme solution aux défis alimentaires et climatiques du continent.</p>
-        <a href="#" class="btn btn-primary">Lire l'article</a>
+        <!-- Date dynamique (utilisez le pipe 'date' comme pour les reportages) -->
+        <span class="news-date">
+          <i class="far fa-calendar-alt"></i> {{ agroEchoData.eventDate | date:'dd MMMM yyyy':'':'fr-FR' }}
+        </span>
+
+        <!-- Titre dynamique -->
+        <h2>{{ agroEchoData.title }}</h2>
+
+        <!-- Description dynamique -->
+        <p>{{ agroEchoData.description }}</p>
+
+        <!-- Lien dynamique (pensez à créer la route '/agro-echos/:id' dans votre fichier de routing) -->
+        <a [routerLink]="['/agro-echos', agroEchoData.id]" class="btn btn-primary" *ngIf="agroEchoData.id">Lire
+          l'article</a>
       </div>
     </div>
   </div>
