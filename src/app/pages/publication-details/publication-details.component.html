@@ -1,0 +1,55 @@
+<!-- Indicateurs de statut -->
+<div *ngIf="isLoading" class="status-indicator">
+  <p>Chargement en cours...</p>
+</div>
+
+<div *ngIf="!isLoading && errorMessage" class="status-indicator error">
+  <p>{{ errorMessage }}</p>
+  <button (click)="goBack()" class="btn-primary">Retour</button>
+</div>
+
+<!-- Conteneur principal de la publication -->
+<div *ngIf="!isLoading && publication" class="publication-container">
+
+  <header class="publication-header">
+    <button (click)="goBack()" class="back-button">← Retour à la liste</button>
+
+    <h1 class="publication-title">{{ publication.title }}</h1>
+
+    <div class="publication-meta">
+      <span class="meta-item">
+        <i class="far fa-calendar-alt"></i>
+        {{ publication.eventDate | date:'fullDate':'':'fr-FR' }}
+      </span>
+      <span class="meta-item" *ngIf="publication.location">
+        <i class="fas fa-map-marker-alt"></i>
+        {{ publication.location }}
+      </span>
+      <span class="meta-item" *ngIf="publication.userDisplayName">
+        <i class="far fa-user"></i>
+        Par {{ publication.userDisplayName }}
+      </span>
+    </div>
+  </header>
+
+  <!-- Galerie d'images (si des photos existent) -->
+  <div class="publication-gallery" *ngIf="publication.photoUrls && publication.photoUrls.length > 0">
+    <div class="main-image">
+      <img [src]="mainImageUrl" [alt]="publication.title" *ngIf="mainImageUrl">
+    </div>
+    <!-- Afficher les vignettes seulement s'il y a plus d'une photo -->
+    <div class="thumbnails" *ngIf="publication.photoUrls.length > 1">
+      <img *ngFor="let url of publication.photoUrls" [src]="url" [alt]="'Vignette de ' + publication.title"
+        class="thumbnail" [class.active]="url === mainImageUrl" (click)="changeMainImage(url)">
+    </div>
+  </div>
+
+  <!-- Contenu texte de l'article -->
+  <main class="publication-content">
+    <!-- Utiliser [innerHTML] pour interpréter le contenu HTML venant de votre base de données.
+         ATTENTION : Assurez-vous que ce contenu est toujours sécurisé (sanitisé) avant de l'enregistrer
+         pour vous protéger contre les attaques XSS. -->
+    <div [innerHTML]="publication.content"></div>
+  </main>
+
+</div>
