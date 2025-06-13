@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { HeroComponent } from './components/hero/hero.component';
 import { ReportagePageComponent } from './pages/reportage-page/reportage-page.component';
+import { loginGuard } from './guards/login.guard';
 import { AgroEchoPagesComponent } from './pages/agro-echo-pages/agro-echo-pages.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { DashboardPagesComponent } from './pages/dashboard-pages/dashboard-pages.component';
@@ -30,16 +31,22 @@ export const routes: Routes = [
   {
     path: 'board',
     component: DashboardPagesComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard], // Protégé : Seuls les connectés y accèdent
   },
   {
     path: 'create-publication',
     component: CreatePublicationPagesComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard], // Protégé : Seuls les connectés y accèdent
   },
   {
     path: 'connexion',
     component: LoginPageComponent,
+    canActivate: [loginGuard], // NOUVEAU : Protégé par le loginGuard
+  },
+  {
+    path: 'apercu-publication',
+    component: PublicationDetailComponent,
+    canActivate: [authGuard], // Important: seul un utilisateur connecté peut prévisualiser
   },
   {
     path: 'auth/callback',
